@@ -93,7 +93,7 @@ const combos=[
 let cart=[];
 const cats=["All",...new Set(menu.map(x=>x.c))];
 document.querySelector("#year").textContent=new Date().getFullYear();
-document.querySelector("#tabs").innerHTML=cats.map((c,i)=>'<button class="tab '+(i===0?"active":"")+'" onclick="filterCat(\''+c+'\',this)">'+c+'</button>').join("");
+document.querySelector("#tabs").innerHTML=cats.map((c,i)=>'<button class="tab '+(i===0?"active":"")+'" data-cat="'+c+'" onclick="filterCat(this.dataset.cat,this)">'+c+'</button>').join("");
 render(menu);
 document.querySelector("#combosGrid").innerHTML=combos.map((x,i)=>'<div class="combo"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><div class="cprice">₹'+x[2]+'</div><button onclick="addCombo('+i+')">ADD COMBO</button></div>').join("");
 
