@@ -88,12 +88,12 @@ const combos=[
 ["Non Veg Meal 1 • Lunch Only","Egg Curry (2 Pcs) + Paneer Curry + 2 Butter Naan + Raita + Salad",209],
 ["Non Veg Meal 2 • Lunch Only","Egg Curry (2 Pcs) + Fish Curry (1 Pc) + Bowl of Rice + 2 Butter Roti + Raita + Salad",229],
 ["Non Veg Meal 3 • Lunch Only","Chicken Curry (2 Pcs) + Fish Curry (1 Pc) + Bowl of Rice + 2 Butter Roti + Raita + Salad",279]
-].map((x,i)=>({n:x[0],c:x[1],p:x[2],i:x[3],id:i+1}));
+].map((x,i)=>({n:x[0],c:x[1],p:x[2],id:i+1}));
 
 let cart=[];
 const cats=["All",...new Set(menu.map(x=>x.c))];
 document.querySelector("#year").textContent=new Date().getFullYear();
-document.querySelector("#tabs").innerHTML=cats.map((c,i)=>'<button class="tab '+(i===0?"active":"")+'" onclick="filterCat(\\''+c+'\\',this)">'+c+'</button>').join("");
+document.querySelector("#tabs").innerHTML=cats.map((c,i)=>'<button class="tab '+(i===0?"active":"")+'" onclick="filterCat(\''+c+'\',this)">'+c+'</button>').join("");
 render(menu);
 document.querySelector("#combosGrid").innerHTML=combos.map((x,i)=>'<div class="combo"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><div class="cprice">₹'+x[2]+'</div><button onclick="addCombo('+i+')">ADD COMBO</button></div>').join("");
 
