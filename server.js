@@ -1,5 +1,5 @@
 require("dotenv").config();
-const express=require("express"),crypto=require("crypto"),fs=rrequire ("fs"),path=require("path"),Razorpay=require("razorpay");
+const express=require("express"),crypto=require("crypto"),fs=require ("fs"),path=require("path"),Razorpay=require("razorpay");
 const app=express();app.use(express.json({limit:"1mb"}));const PORT=process.env.PORT||3000;const db=path.join(__dirname,"orders.json");
 const read=()=>{try{return JSON.parse(fs.readFileSync(db,"utf8"))}catch{return[]}};const save=x=>fs.writeFileSync(db,JSON.stringify(x,null,2));
 const rp=process.env.RAZORPAY_KEY_ID&&process.env.RAZORPAY_KEY_SECRET?new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET}):null;
