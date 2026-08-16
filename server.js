@@ -117,3 +117,4 @@ async function pay(){
 app.get("/",(req,res)=>res.type("html").send(PAGE));
 
 app.post("/api/create-order",async(req,res)=>{try{if(!rp)return res.status(503).json({error:"Razorpay is not configured"});const {amount}=req.body;if(!amount)return res.status(400).json({error:"Amount is required"});const order=await rp.orders.create({amount:Math.round(Number(amount)*100),currency:"INR",receipt:"order_"+Date.now()});res.json(order)}catch(e){console.error(e);res.status(500).json({error:"Unable to create order"})}});
+const PORT=process.env.PORT||10000;app.listen(PORT,"0.0.0.0",()=>console.log(`Server running on port ${PORT}`));
