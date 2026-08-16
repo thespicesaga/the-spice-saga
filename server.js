@@ -88,7 +88,7 @@ const combos=[
 ["Non Veg Meal 1 • Lunch Only","Egg Curry (2 Pcs) + Paneer Curry + 2 Butter Naan + Raita + Salad",209],
 ["Non Veg Meal 2 • Lunch Only","Egg Curry (2 Pcs) + Fish Curry (1 Pc) + Bowl of Rice + 2 Butter Roti + Raita + Salad",229],
 ["Non Veg Meal 3 • Lunch Only","Chicken Curry (2 Pcs) + Fish Curry (1 Pc) + Bowl of Rice + 2 Butter Roti + Raita + Salad",279]
-];
+].map((x,i)=>({n:x[0],c:x[1],p:x[2],i:x[3],id:i+1}));
 
 let cart=[];
 const cats=["All",...new Set(menu.map(x=>x.c))];
