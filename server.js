@@ -627,7 +627,412 @@ res.json({
     });
   }
 });
+const ADMIN_PASSWORD=
+  process.env.ADMIN_PASSWORD||"spicesaga123";
 
+
+function adminAuth(req,res,next){
+
+  const auth=
+    req.headers.authorization||"";
+
+  if(!auth.startsWith("Basic ")){
+    res.set("WWW-Authenticate",'Basic realm="The Spice Saga Admin"');
+    return res.status(401).send("Admin login required");
+  }
+
+  const decoded=
+    Buffer.from(
+      auth.split(" ")[1],
+      "base64"
+    ).toString();
+
+  const parts=decoded.split(":");
+
+  const password=parts.slice(1).join(":");
+
+  if(password!==ADMIN_PASSWORD){
+    res.set("WWW-Authenticate",'Basic realm="The Spice Saga Admin"');
+    return res.status(401).send("Invalid admin password");
+  }
+
+  next();
+}
+
+
+app.get("/admin",adminAuth,(req,res)=>{
+
+  const orders=read();
+
+  const html=`
+<!doctype html>
+<html>
+<head>
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>The Spice Saga - Admin</title>
+
+<style>
+
+body{
+  font-family:Arial,sans-serif;
+  margin:0;
+  background:#f5f5f5;
+  color:#222;
+}
+
+header{
+  background:#10110e;
+  color:white;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+header h1{
+  margin:0;
+  font-size:22px;
+}
+
+header small{
+  color:#ccc;
+}
+
+.container{
+  padding:14px;
+  max-width:1000px;
+  margin:auto;
+}
+
+.order{
+  background:white;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px #0001;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+
+.order-number{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.amount{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.customer{
+  margin-top:12px;
+  line-height:1.6;
+}
+
+.items{
+  margin-top:12px;
+  background:#f7f7f7;
+  border-radius:10px;
+  padding:10px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  padding:5px 0;
+}
+
+select{
+  margin-top:12px;
+  width:100%;
+  padding:11px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+.paid{
+  color:#087f23;
+  font-weight:bold;
+}
+
+.empty{
+  text-align:center;
+  padding:50px 10px;
+  color:#777;
+}
+
+.refresh{
+  background:#c99527;
+  color:white;
+  border:0;
+  padding:10px 16px;
+  border-radius:8px;
+  margin-top:10px;
+  font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>The Spice Saga — Admin</h1>
+
+<small>Order Management</small>
+
+<br>
+
+<button class="refresh"
+onclick="location.reload()">
+Refresh Orders
+</button>
+
+</header>
+
+<div class="container">
+
+${
+orders.length===0
+?
+'<div class="empty">No orders yet.</div>'
+:
+orders.slice().reverse().map(o=>{
+
+  const customer=o.customer||{};
+
+  const items=o.items||[];
+
+  return `
+
+  <div class="order">
+
+    <div class="top">
+
+      <div class="order-number">
+        ${o.order_number||"No Order Number"}
+      </div>
+
+      <div class="amount">
+        ₹${Number(o.amount||0).toFixed(2)}
+      </div>
+
+    </div>
+
+    <div class="customer">
+
+      <b>Customer:</b>
+      ${customer.name||"-"}<br>
+
+      <b>Mobile:</b>
+      ${customer.phone||"-"}<br>
+
+      <b>Location:</b>
+      ${customer.location||"-"}<br>
+
+      <b>Instructions:</b>
+      ${customer.notes||"-"}<br>
+
+      <b>Time:</b>
+      ${o.created_at
+        ?new Date(o.created_at).toLocaleString("en-IN")
+        :"-"}
+
+    </div>
+
+    <div class="items">
+
+      <b>Items</b>
+
+      ${
+        items.length
+        ?
+        items.map(i=>`
+
+          <div class="item">
+
+            <span>
+              ${i.n||i.name||"Item"}
+              × ${i.qty||i.quantity||1}
+            </span>
+
+            <span>
+              ₹${
+                Number(
+                  i.p||i.price||0
+                )*
+                Number(i.qty||i.quantity||1)
+              }
+            </span>
+
+          </div>
+
+        `).join("")
+        :
+        "<div>No item information</div>"
+      }
+
+    </div>
+
+    <select
+      onchange="updateStatus(
+        '${o.order_number}',
+        this.value
+      )">
+
+      <option
+        value="PAID"
+        ${o.status==="PAID"?"selected":""}>
+        💰 PAID
+      </option>
+
+      <option
+        value="PREPARING"
+        ${o.status==="PREPARING"?"selected":""}>
+        👨‍🍳 PREPARING
+      </option>
+
+      <option
+        value="OUT_FOR_DELIVERY"
+        ${o.status==="OUT_FOR_DELIVERY"?"selected":""}>
+        🛵 OUT FOR DELIVERY
+      </option>
+
+      <option
+        value="DELIVERED"
+        ${o.status==="DELIVERED"?"selected":""}>
+        ✅ DELIVERED
+      </option>
+
+      <option
+        value="CANCELLED"
+        ${o.status==="CANCELLED"?"selected":""}>
+        ❌ CANCELLED
+      </option>
+
+    </select>
+
+  </div>
+
+  `;
+
+}).join("")
+}
+
+</div>
+
+<script>
+
+async function updateStatus(orderNumber,status){
+
+  const response=
+    await fetch("/api/admin/order-status",{
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body:JSON.stringify({
+        order_number:orderNumber,
+        status:status
+      })
+
+    });
+
+  if(!response.ok){
+
+    alert("Unable to update order status.");
+
+    location.reload();
+
+    return;
+  }
+
+  alert("Order status updated.");
+
+}
+
+</script>
+
+</body>
+</html>
+`;
+
+  res.type("html").send(html);
+
+});
+
+
+app.post(
+  "/api/admin/order-status",
+  adminAuth,
+  (req,res)=>{
+
+    const {
+      order_number,
+      status
+    }=req.body;
+
+    const allowed=[
+      "PAID",
+      "PREPARING",
+      "OUT_FOR_DELIVERY",
+      "DELIVERED",
+      "CANCELLED"
+    ];
+
+    if(
+      !order_number||
+      !allowed.includes(status)
+    ){
+
+      return res.status(400).json({
+        success:false,
+        error:"Invalid order status"
+      });
+
+    }
+
+    const orders=read();
+
+    const order=
+      orders.find(
+        x=>x.order_number===order_number
+      );
+
+    if(!order){
+
+      return res.status(404).json({
+        success:false,
+        error:"Order not found"
+      });
+
+    }
+
+    order.status=status;
+
+    order.updated_at=
+      new Date().toISOString();
+
+    save(orders);
+
+    res.json({
+      success:true
+    });
+
+  }
+);
 app.listen(
   process.env.PORT||10000,
   "0.0.0.0",
