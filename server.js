@@ -504,7 +504,7 @@ app.post("/api/create-order",async(req,res)=>{
   }
 });
 
-app.post("/api/verify-payment",(req,res)=>{
+app.post("/api/verify-payment", async (req,res)=>{
 
   try{
 
