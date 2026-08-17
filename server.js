@@ -553,6 +553,47 @@ app.post("/api/verify-payment",(req,res)=>{
 
 const orders=read();
 
+let paidAmount=0;
+
+try{
+  const razorpayOrder=
+    await rp.orders.fetch(razorpay_order_id);
+
+  paidAmount=Number(razorpayOrder.amount)/100;
+}catch(e){
+  console.error("Unable to fetch Razorpay order amount:",e);
+}
+
+orders.push({
+  order_number:orderNumber,
+
+  razorpay_order_id:
+    razorpay_order_id,
+
+  razorpay_payment_id:
+    razorpay_payment_id,
+
+  customer:customer||{},
+
+  items:items||[],
+
+  amount:paidAmount,
+
+  status:"PAID",
+
+  created_at:
+    new Date().toISOString()
+});
+
+save(orders);
+
+res.json({
+  success:true,
+  order_number:orderNumber
+});
+
+const orders=read();
+
 orders.push({
   order_number:orderNumber,
   razorpay_order_id:razorpay_order_id,
