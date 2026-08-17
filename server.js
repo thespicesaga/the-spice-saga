@@ -91,30 +91,485 @@ const combos=[
 ].map((x,i)=>({n:x[0],c:x[1],p:x[2],id:i+1}));
 
 let cart=[];
+
 const cats=["All",...new Set(menu.map(x=>x.c))];
+
 document.querySelector("#year").textContent=new Date().getFullYear();
-document.querySelector("#tabs").innerHTML=cats.map((c,i)=>'<button class="tab '+(i===0?"active":"")+'" data-cat="'+c+'" onclick="filterCat(this.dataset.cat,this)">'+c+'</button>').join("");
+
+const tabs=document.querySelector("#tabs");
+
+tabs.innerHTML=cats.map((c,i)=>
+  '<button class="tab '+(i===0?"active":"")+'" data-cat="'+c+'">'+c+'</button>'
+).join("");
+
+function render(list){
+  document.querySelector("#items").innerHTML=list.map(x=>
+    '<article class="card">'+
+    '<div class="icon">'+x.i+'</div>'+
+    '<h3>'+x.n+'</h3>'+
+    '<div class="desc">'+x.c+'</div>'+
+    '<div class="price">'+(typeof x.p==="number"?"₹"+x.p:x.p)+'</div>'+
+    '<button class="add" '+(typeof x.p!=="number"?"disabled":"")+
+    ' onclick="add('+x.id+')">'+
+    (typeof x.p==="number"?"ADD TO ORDER":"CALL TO ORDER")+
+    '</button>'+
+    '</article>'
+  ).join("");
+}
+
+document.querySelectorAll("#tabs .tab").forEach(function(button){
+  button.addEventListener("click",function(){
+    document.querySelectorAll("#tabs .tab").forEach(function(b){
+      b.classList.remove("active");
+    });
+
+    this.classList.add("active");
+
+    const category=this.dataset.cat;
+
+    render(
+      category==="All"
+      ? menu
+      : menu.filter(function(item){
+          return item.c===category;
+        })
+    );
+  });
+});
+
 render(menu);
-document.querySelector("#combosGrid").innerHTML=combos.map((x,i)=>'<div class="combo"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><div class="cprice">₹'+x[2]+'</div><button onclick="addCombo('+i+')">ADD COMBO</button></div>').join("");
 
-function render(list){document.querySelector("#items").innerHTML=list.map(x=>'<article class="card"><div class="icon">'+x.i+'</div><h3>'+x.n+'</h3><div class="desc">'+x.c+'</div><div class="price">'+(typeof x.p==="number"?"₹"+x.p:x.p)+'</div><button class="add" '+(typeof x.p!=="number"?"disabled":"")+' onclick="add('+x.id+')">'+(typeof x.p==="number"?"ADD TO ORDER":"CALL TO ORDER")+'</button></article>').join("")}
-function filterCat(c,b){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");render(c==="All"?menu:menu.filter(x=>x.c===c))}
-function add(id){let x=menu.find(a=>a.id===id);let z=cart.find(a=>a.key==="m"+id);z?z.q++:cart.push({key:"m"+id,name:x.n,price:x.p,q:1});update();openCart()}
-function addCombo(i){let x=combos[i],z=cart.find(a=>a.key==="c"+i);z?z.q++:cart.push({key:"c"+i,name:x[0],price:x[2],q:1});update();openCart()}
-function update(){document.querySelector("#count").textContent=cart.reduce((s,x)=>s+x.q,0);document.querySelector("#cart").innerHTML=cart.length?cart.map(x=>'<div class="cartrow"><div><b>'+x.name+'</b><br><span class="muted">₹'+x.price+' × '+x.q+'</span></div><div class="qty"><button onclick="change(\\''+x.key+'\\',-1)">−</button> '+x.q+' <button onclick="change(\\''+x.key+'\\',1)">+</button></div></div>').join(""):'<p class="muted">Your cart is empty.</p>';document.querySelector("#total").textContent="₹"+sum()}
-function change(k,n){let x=cart.find(a=>a.key===k);x.q+=n;if(x.q<=0)cart=cart.filter(a=>a.key!==k);update()}
-function sum(){return cart.reduce((s,x)=>s+(typeof x.price==="number"?x.price:0)*x.q,0)}
-function openCart(){document.querySelector("#drawer").style.display="block";update()}function closeCart(){document.querySelector("#drawer").style.display="none"}function shadeClose(e){if(e.target.id==="drawer")closeCart()}
-function checkout(){if(!cart.length)return alert("Please add items to your order.");closeCart();document.querySelector("#paytotal").textContent="₹"+sum();document.querySelector("#modal").style.display="grid"}function closeCheckout(){document.querySelector("#modal").style.display="none"}
+function add(id){
+
+  const item=menu.find(function(x){
+    return x.id===id;
+  });
+
+  if(!item)return;
+
+  const existing=cart.find(function(x){
+    return x.key==="m"+id;
+  });
+
+  if(existing){
+    existing.q++;
+  }else{
+    cart.push({
+      key:"m"+id,
+      name:item.n,
+      price:item.p,
+      q:1
+    });
+  }
+
+  update();
+  openCart();
+}
+
+function update(){
+
+  document.querySelector("#count").textContent=
+    cart.reduce(function(total,item){
+      return total+item.q;
+    },0);
+
+  if(!cart.length){
+
+    document.querySelector("#cart").innerHTML=
+      '<p class="muted">Your cart is empty.</p>';
+
+  }else{
+
+    document.querySelector("#cart").innerHTML=
+      cart.map(function(item){
+
+        return '<div class="cartrow">'+
+          '<div>'+
+            '<b>'+item.name+'</b><br>'+
+            '<span class="muted">₹'+item.price+' × '+item.q+'</span>'+
+          '</div>'+
+          '<div class="qty">'+
+            '<button onclick="change(\''+item.key+'\',-1)">−</button>'+
+            ' '+item.q+' '+
+            '<button onclick="change(\''+item.key+'\',1)">+</button>'+
+          '</div>'+
+        '</div>';
+
+      }).join("");
+  }
+
+  document.querySelector("#total").textContent="₹"+sum();
+}
+
+function change(key,amount){
+
+  const item=cart.find(function(x){
+    return x.key===key;
+  });
+
+  if(!item)return;
+
+  item.q+=amount;
+
+  if(item.q<=0){
+    cart=cart.filter(function(x){
+      return x.key!==key;
+    });
+  }
+
+  update();
+}
+
+function sum(){
+
+  return cart.reduce(function(total,item){
+
+    return total+
+      (typeof item.price==="number"
+        ? item.price
+        : 0)*item.q;
+
+  },0);
+}
+
+function openCart(){
+
+  document.querySelector("#drawer").style.display="block";
+
+  update();
+}
+
+function closeCart(){
+
+  document.querySelector("#drawer").style.display="none";
+}
+
+function shadeClose(event){
+
+  if(event.target.id==="drawer"){
+    closeCart();
+  }
+}
+
+function checkout(){
+
+  if(!cart.length){
+    alert("Please add items to your order.");
+    return;
+  }
+
+  closeCart();
+
+  document.querySelector("#paytotal").textContent="₹"+sum();
+
+  document.querySelector("#modal").style.display="grid";
+}
+
+function closeCheckout(){
+
+  document.querySelector("#modal").style.display="none";
+}
+
 async function pay(){
- const name=document.querySelector("#name").value.trim(),phone=document.querySelector("#phone").value.trim(),location=document.querySelector("#location").value.trim(),notes=document.querySelector("#notes").value.trim();
- if(!name||!/^[0-9]{10}$/.test(phone)||!location)return alert("Please enter your name, 10-digit mobile number and delivery location.");
- try{let r=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:sum(),name,phone,location,notes,items:cart})});let o=await r.json();if(!r.ok)throw new Error(o.error);
- let rz=new Razorpay({key:o.key_id,amount:o.amount,currency:"INR",name:"The Spice Saga",description:"Food Order",order_id:o.id,prefill:{name,contact:"+91"+phone},theme:{color:"#c99527"},handler:async function(resp){let v=await fetch("/api/verify-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...resp,customer:{name,phone,location,notes},items:cart})}).then(x=>x.json());if(v.success){cart=[];update();closeCheckout();alert("Order confirmed! Order ID: "+v.order_number)}else alert("Payment verification failed. Please contact The Spice Saga.")}});rz.on("payment.failed",()=>alert("Payment failed or cancelled. Please try again."));rz.open()
- }catch(e){alert(e.message||"Unable to start payment.")}
-}</script></body></html>`;
 
-app.get("/",(req,res)=>res.type("html").send(PAGE));
+  const name=
+    document.querySelector("#name").value.trim();
 
-app.post("/api/create-order",async(req,res)=>{try{if(!rp)return res.status(503).json({error:"Razorpay is not configured"});const {amount}=req.body;if(!amount)return res.status(400).json({error:"Amount is required"});const order=await rp.orders.create({amount:Math.round(Number(amount)*100),currency:"INR",receipt:"order_"+Date.now()});res.json(order)}catch(e){console.error(e);res.status(500).json({error:"Unable to create order"})}});
-app.listen(process.env.PORT||10000,"0.0.0.0",()=>console.log("Server running"));
+  const phone=
+    document.querySelector("#phone").value.trim();
+
+  const location=
+    document.querySelector("#location").value.trim();
+
+  const notes=
+    document.querySelector("#notes").value.trim();
+
+  if(
+    !name ||
+    !/^[0-9]{10}$/.test(phone) ||
+    !location
+  ){
+
+    alert(
+      "Please enter your name, 10-digit mobile number and delivery location."
+    );
+
+    return;
+  }
+
+  try{
+
+    const response=await fetch("/api/create-order",{
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body:JSON.stringify({
+        amount:sum(),
+        name:name,
+        phone:phone,
+        location:location,
+        notes:notes,
+        items:cart
+      })
+    });
+
+    const order=await response.json();
+
+    if(!response.ok){
+      throw new Error(
+        order.error||"Unable to create order"
+      );
+    }
+
+    const razorpay=new Razorpay({
+
+      key:order.key_id,
+
+      amount:order.amount,
+
+      currency:"INR",
+
+      name:"The Spice Saga",
+
+      description:"Food Order",
+
+      order_id:order.id,
+
+      prefill:{
+        name:name,
+        contact:"+91"+phone
+      },
+
+      theme:{
+        color:"#c99527"
+      },
+
+      handler:async function(payment){
+
+        const verification=await fetch(
+          "/api/verify-payment",
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+              ...payment,
+
+              customer:{
+                name:name,
+                phone:phone,
+                location:location,
+                notes:notes
+              },
+
+              items:cart
+            })
+          }
+        );
+
+        const result=
+          await verification.json();
+
+        if(result.success){
+
+          cart=[];
+
+          update();
+
+          closeCheckout();
+
+          alert(
+            "Order confirmed! Order ID: "+
+            result.order_number
+          );
+
+        }else{
+
+          alert(
+            "Payment verification failed. Please contact The Spice Saga."
+          );
+        }
+      }
+    });
+
+    razorpay.on(
+      "payment.failed",
+      function(){
+        alert(
+          "Payment failed or cancelled. Please try again."
+        );
+      }
+    );
+
+    razorpay.open();
+
+  }catch(error){
+
+    alert(
+      error.message||
+      "Unable to start payment."
+    );
+  }
+}
+
+</script></body></html>`;
+
+app.get("/",(req,res)=>{
+  res.type("html").send(PAGE);
+});
+
+app.post("/api/create-order",async(req,res)=>{
+
+  try{
+
+    if(!rp){
+
+      return res.status(503).json({
+        error:"Razorpay is not configured"
+      });
+    }
+
+    const {
+      amount,
+      name,
+      phone,
+      location,
+      notes,
+      items
+    }=req.body;
+
+    if(
+      !amount||
+      !name||
+      !phone||
+      !location||
+      !items||
+      !items.length
+    ){
+
+      return res.status(400).json({
+        error:"Please provide complete order details"
+      });
+    }
+
+    const order=
+      await rp.orders.create({
+
+        amount:
+          Math.round(
+            Number(amount)*100
+          ),
+
+        currency:"INR",
+
+        receipt:
+          "SS"+Date.now(),
+
+        notes:{
+          customer_name:name,
+          phone:phone,
+          delivery_location:location
+        }
+      });
+
+    res.json({
+
+      id:order.id,
+
+      amount:order.amount,
+
+      currency:order.currency,
+
+      key_id:
+        process.env.RAZORPAY_KEY_ID
+    });
+
+  }catch(error){
+
+    console.error(error);
+
+    res.status(500).json({
+      error:
+        error.error?.description||
+        error.message||
+        "Unable to create order"
+    });
+  }
+});
+
+app.post("/api/verify-payment",(req,res)=>{
+
+  try{
+
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    }=req.body;
+
+    if(
+      !razorpay_order_id||
+      !razorpay_payment_id||
+      !razorpay_signature
+    ){
+
+      return res.status(400).json({
+        success:false,
+        error:"Missing payment information"
+      });
+    }
+
+    const expected=
+      crypto
+      .createHmac(
+        "sha256",
+        process.env.RAZORPAY_KEY_SECRET
+      )
+      .update(
+        razorpay_order_id+
+        "|"+
+        razorpay_payment_id
+      )
+      .digest("hex");
+
+    if(expected!==razorpay_signature){
+
+      return res.status(400).json({
+        success:false,
+        error:"Invalid payment signature"
+      });
+    }
+
+    const orderNumber=
+      "SS-"+Date.now();
+
+    res.json({
+      success:true,
+      order_number:orderNumber
+    });
+
+  }catch(error){
+
+    console.error(error);
+
+    res.status(500).json({
+      success:false,
+      error:"Payment verification failed"
+    });
+  }
+});
+
+app.listen(
+  process.env.PORT||10000,
+  "0.0.0.0",
+  ()=>{
+    console.log("The Spice Saga server is running");
+  }
+);
