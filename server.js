@@ -509,10 +509,12 @@ app.post("/api/verify-payment",(req,res)=>{
   try{
 
     const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    }=req.body;
+  razorpay_order_id,
+  razorpay_payment_id,
+  razorpay_signature,
+  customer,
+  items
+}=req.body;
 
     if(
       !razorpay_order_id||
