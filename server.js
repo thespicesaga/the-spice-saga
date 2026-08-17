@@ -592,7 +592,6 @@ res.json({
   order_number:orderNumber
 });
 
-const orders=read();
 
 
   }catch(error){
