@@ -547,7 +547,26 @@ app.post("/api/verify-payment",(req,res)=>{
       });
     }
 
-    const orderNumber=
+    const orderNumber="SS-"+Date.now();
+
+const orders=read();
+
+orders.push({
+  order_number:orderNumber,
+  razorpay_order_id:razorpay_order_id,
+  razorpay_payment_id:razorpay_payment_id,
+  customer:req.body.customer||{},
+  items:req.body.items||[],
+  status:"PAID",
+  created_at:new Date().toISOString()
+});
+
+save(orders);
+
+res.json({
+  success:true,
+  order_number:orderNumber
+});
       "SS-"+Date.now();
 
     res.json({
