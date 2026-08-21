@@ -1,0 +1,10 @@
+{
+  "name": "The Spice Saga",
+  "short_name": "Spice Saga",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f0dc",
+  "theme_color": "#173b1b",
+  "description": "The Spice Saga - Order Online",
+  "icons": []
+}
