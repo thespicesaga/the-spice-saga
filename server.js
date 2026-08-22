@@ -428,8 +428,16 @@ if ("serviceWorker" in navigator) {
 }
 </script></body></html>`;
 
-app.get("/",(req,res)=>{
-  res.type("html").send(PAGE);
+app.get("/manifest.json",(req,res)=>{
+    res.sendFile(path.join(__dirname,"manifest.json"));
+});
+
+app.get("/icon-192.png",(req,res)=>{
+    res.sendFile(path.join(__dirname,"icon-192.png"));
+});
+
+app.get("/icon-512.png",(req,res)=>{
+    res.sendFile(path.join(__dirname,"icon-512.png"));
 });
 
 app.post("/api/create-order",async(req,res)=>{
