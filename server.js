@@ -1025,6 +1025,20 @@ app.post(
 
   }
 );
+app.get("/", (req, res) => {
+  res.send(PAGE);
+});
+
+app.get("/manifest.json", (req, res) => {
+  res.sendFile(path.join(__dirname, "manifest.json"));
+});
+app.get("/icon-192.png", (req, res) => {
+  res.sendFile(path.join(__dirname, "icon-192.png"));
+});
+
+app.get("/icon-512.png", (req, res) => {
+  res.sendFile(path.join(__dirname, "icon-512.png"));
+});
 app.listen(
   process.env.PORT||10000,
   "0.0.0.0",
