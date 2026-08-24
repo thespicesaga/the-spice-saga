@@ -16,10 +16,34 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
 
 <section class="hero">
   <div class="hero-copy">
-    <span class="kicker">THE SPICE SAGA • IIT INDORE</span>
-    <h1>Good food.<br><span>Great stories.</span></h1>
-    <p>Your favourite Indian, tandoori, biryani and comfort-food classics — freshly prepared and available for direct ordering.</p>
-    <button class="gold" onclick="document.querySelector('#menu').scrollIntoView({behavior:'smooth'})">ORDER NOW</button>
+
+    <span class="kicker">THE SPICE SAGA • INDORE</span>
+
+    <h1>
+      Good food.
+      <br>
+      <span>Great stories.</span>
+    </h1>
+
+    <p>
+      Indian flavours, tandoori favourites, biryanis and
+      comfort-food classics — freshly prepared and made
+      for you.
+    </p>
+
+    <div class="hero-actions">
+      <button class="gold" onclick="document.querySelector('#menu').scrollIntoView({behavior:'smooth'})">
+        ORDER NOW
+      </button>
+      <button class="hero-link" onclick="document.querySelector('#menu').scrollIntoView({behavior:'smooth'})">
+        EXPLORE MENU →
+      </button>
+    </div>
+
+    <div class="hero-note">
+      ✦ Freshly prepared &nbsp; • &nbsp; Direct ordering &nbsp; • &nbsp; Indore
+    </div>
+
   </div>
 </section>
 
