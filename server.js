@@ -32,7 +32,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
     </p>
 
     <div class="hero-actions">
-      <a class="gold" href="#menu">ORDER NOW</a>
+      <a class="gold" href="#" onclick="openCart(); return false;">ORDER NOW</a>
       <a class="hero-link" href="#menu">EXPLORE MENU →</a>
     </div>
 
