@@ -162,7 +162,7 @@ render(menu);
 function add(id){
 
   const item=menu.find(function(x){
-    return x.id===id;
+    return String(x.id)===String(id);
   });
 
   if(!item)return;
