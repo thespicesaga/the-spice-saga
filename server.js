@@ -11,7 +11,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
 <header class="nav">
   <a class="brand" href="#"><div class="mark">✦</div><div><strong>The Spice Saga</strong><small>Where Every Bite Tells a Story</small></div></a>
   <nav><a href="#menu">Menu</a><a href="#combos">Combos</a></nav>
-  <button class="cart" onclick="openCart()">🛒 <span id="count">0</span></button>
+  <button class="cart" onclick="document.querySelector('#drawer').style.display='block'; update();">🛒 <span id="count">0</span></button>
 </header>
 
 <section class="hero">
@@ -32,7 +32,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
     </p>
 
     <div class="hero-actions">
-      <button class="gold" onclick="openCart()">ORDER NOW</button>
+      <button class="gold" onclick="document.querySelector('#drawer').style.display='block'; update();">ORDER NOW</button>
       <a class="hero-link" href="#menu">EXPLORE MENU →</a>
     </div>
 
