@@ -64,7 +64,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
 
 <div id="drawer" class="shade" onclick="shadeClose(event)">
  <aside class="drawer" onclick="event.stopPropagation()">
-  <div class="drawer-head"><h2>Your Order</h2><button onclick="closeCart()">×</button></div>
+  <div class="drawer-head"><h2>Your Order</h2><button onclick="document.querySelector('#drawer').style.display='none';">×</button></div>
   <div id="cart"></div><div class="total"><span>Total</span><b id="total">₹0</b></div>
   <button class="gold full" onclick="checkout()">PROCEED TO CHECKOUT</button>
  </aside>
