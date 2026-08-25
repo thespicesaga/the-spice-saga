@@ -33,7 +33,6 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
 
     <div class="hero-actions">
       <button class="gold" onclick="document.querySelector('#menu').scrollIntoView({behavior:'smooth'});">ORDER NOW</button>
-      <a class="hero-link" href="#menu">EXPLORE MENU →</a>
     </div>
 
     <div class="hero-note">
