@@ -32,7 +32,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
     </p>
 
     <div class="hero-actions">
-      <button class="gold" onclick="window.scrollTo({top:document.getElementById('menu').offsetTop,behavior:'smooth'});">ORDER NOW</button>
+      <button type="button" class="gold" onclick="openCart()">ORDER NOW</button>
     </div>
 
     <div class="hero-note">
