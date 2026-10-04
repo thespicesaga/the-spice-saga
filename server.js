@@ -32,7 +32,7 @@ const PAGE=String.raw`<!doctype html><html lang="en"><head><meta charset="utf-8"
     </p>
 
     <div class="hero-actions">
-      <button type="button" class="gold" onclick="document.getElementById('drawer').style.display='block'">ORDER NOW</button>
+      <button type="button" class="gold" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth',block:'start'})">ORDER NOW</button>
     </div>
 
     <div class="hero-note">
